@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "boatire:block/test",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "boatire:block/test"
+    },
+    "facing=south": {
+      "model": "boatire:block/test",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boatire:block/test",
+      "y": 270
+    }
+  }
+}

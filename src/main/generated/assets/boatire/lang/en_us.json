@@ -1,0 +1,12 @@
+{
+  "block.boatire.high_f_ice": "High Fraction Ice",
+  "block.boatire.tire_changer": "Tire Changer",
+  "hud.boatire.tctext": "Tire Changing...",
+  "item.boatire.fm_boat_1": "Formula Boat",
+  "item.boatire.h1_tire": "H1 Tire",
+  "item.boatire.h2_tire": "H2 Tire",
+  "item.boatire.h3_tire": "H3 Tire",
+  "item.boatire.h4_tire": "H4 Tire",
+  "item.boatire.h5_tire": "H5 Tire",
+  "itemGroup.boatire_group": "Boatire Items"
+}

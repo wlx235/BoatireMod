@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "boatire:block/tire_changer",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "boatire:block/tire_changer"
+    },
+    "facing=south": {
+      "model": "boatire:block/tire_changer",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boatire:block/tire_changer",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "boatire",
+	"version": "${version}",
+	"name": "boatire",
+	"description": "A mod that provides F1-like tire system to Minecraft!",
+	"authors": [
+		"wlx233"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/boatire/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"wlx.boatire.Boatire"
+		],
+		"fabric-datagen": [
+          "wlx.boatire.BoatireModDataGenerator"
+		],
+		"client": [
+			"wlx.boatire.BoatireModClient"
+		]
+	},
+	"mixins": [
+		"boatire.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.0",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": ">=0.92.0"
+	}
+}
