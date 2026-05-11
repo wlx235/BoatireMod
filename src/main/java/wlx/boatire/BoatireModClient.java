@@ -79,10 +79,8 @@ public class BoatireModClient implements ClientModInitializer {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null) return;
 
-        // 仅当玩家骑乘 FmBoatEntity 时才显示
         if (!(client.player.getVehicle() instanceof FmBoatEntity boat)) return;
 
-        // --- 计算数据 ---
         int tireId = boat.getLoadedTire();
         String tireName = switch (tireId) {
             case 1 -> "H1";
@@ -93,31 +91,31 @@ public class BoatireModClient implements ClientModInitializer {
             default -> "*" + tireId;
         };
 
-        int radius = 4; // 搜索半径
+        int radius = 4;
         BlockPos playerPos = client.player.getBlockPos();
         int tcStat=0;
         for (BlockPos pos : BlockPos.iterateOutwards(playerPos, radius, radius, radius)) {
             BlockEntity be = client.world.getBlockEntity(pos);
             if (be instanceof TireChangerBlockEntity tireChanger) {
                 tcStat = tireChanger.getTcStatus();
-                //Boatire.LOGGER.info(tcStat+"");
                 break;
             }
         }
 
-        // --- 绘制 ---
         TextRenderer font = client.textRenderer;
         int color = 0xFFFFFFFF;
         int tcColor = 0xFF7FFF00;
         int bkgColor = 0xFF696969;
         int durColor = boat.getTireColor(tireId);
         int screenWidth = client.getWindow().getScaledWidth();
-        int x = screenWidth - 10;  // 右对齐
+        int x = screenWidth - 10;
         int y = 10;
-        int lenMult = 50;
+        int lenMult = FmBoatEntity.basicDur/1000;
 
-        int lenDur = floor((boat.getTireDur()/ FmBoatEntity.basicDur)*lenMult);
-        int maxLenDur = floor(boat.getMaxTireDur(boat.getLoadedTire())*1.0F/FmBoatEntity.basicDur*lenMult);
+        int lenDur = floor((boat.getTireDur()/(FmBoatEntity.basicDur*1.0F))*lenMult);
+
+        int maxLenDur = floor((boat.getMaxTireDur(boat.getLoadedTire())*1.0F/FmBoatEntity.basicDur)*lenMult);
+
         drawContext.drawHorizontalLine(x - maxLenDur,x,y+font.fontHeight/2,bkgColor);
         drawContext.drawHorizontalLine(x - lenDur,x,y+font.fontHeight/2,durColor);
 

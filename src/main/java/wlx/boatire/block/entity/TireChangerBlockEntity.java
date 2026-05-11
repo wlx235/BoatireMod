@@ -118,8 +118,8 @@ public class TireChangerBlockEntity extends BlockEntity implements ExtendedScree
 
                 Direction facing = state1.get(HorizontalFacingBlock.FACING);
 
-                BlockPos centerPos = pos.offset(facing, 2); // 向前两格作为中心
-                double range = 1.5; // 检测半径
+                BlockPos centerPos = pos.offset(facing, 2);
+                double range = 1.5;
                 Box box = new Box(centerPos).expand(range);
                 List<FmBoatEntity> boats = world.getEntitiesByClass(FmBoatEntity.class, box, boat -> true);
 

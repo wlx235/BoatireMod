@@ -820,7 +820,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         nbt.putString("FmType", this.getVariant().asString());
         nbt.putInt("LoadedTire", this.getLoadedTire());
         nbt.putFloat("TireDur", this.getTireDur());
-        //Boatire.LOGGER.info("saving  "+this.getTireDur());
     }
 
     @Override
@@ -1036,7 +1035,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
             case 5 : res+=0.975F;
             default : res=0.98F;
         }
-        //Boatire.LOGGER.info(res+"");
         return res;
     }
     public float getModifiedThrust(){
@@ -1099,7 +1097,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         float spd = (float) vecSpd.horizontalLength();
         float yawDec = abs(this.yawVelocity*0.033F);
         float spdDec = spd+spd*spd*spd/16.0F;
-        //Boatire.LOGGER.info(this.getLoadedTire()+"");
         float fracDec = (spd > 0.5F && !Float.isNaN(frac) && frac < 0.95F) ? (0.989F - frac)*spd : 0;
         float newDur = this.getTireDur() - spdDec - fracDec*(FmBoatEntity.basicDur/100) - yawDec;
         if (Float.isNaN(newDur)) newDur = 0;
