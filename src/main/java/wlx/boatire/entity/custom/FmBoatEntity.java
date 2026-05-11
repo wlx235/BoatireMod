@@ -118,7 +118,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     public static boolean ON_PACKED_ICE = false;
     public static boolean ON_BLUE_ICE = false;
 
-    public static final int basicDur = 100000;
+    public static final int basicDur = 50000;
 
     public FmBoatEntity(EntityType<FmBoatEntity> entityType, World world) {
         super(entityType, world);
