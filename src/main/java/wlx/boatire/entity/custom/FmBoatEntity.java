@@ -64,6 +64,7 @@ import wlx.boatire.entity.ModEntities;
 import wlx.boatire.item.ModItems;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.cos;
 
 public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.FmType> {
     private static final TrackedData<Integer> DAMAGE_WOBBLE_TICKS = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -113,12 +114,12 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     private float bubbleWobble;
     private float lastBubbleWobble;
 
-    private static boolean TIRE_BROKEN = false;
-    private static boolean TIRE_LOW = false;
-    public static boolean ON_PACKED_ICE = false;
-    public static boolean ON_BLUE_ICE = false;
+    private boolean TIRE_BROKEN = false;
+    private boolean TIRE_LOW = false;
+    private boolean ON_PACKED_ICE = false;
+    private boolean ON_BLUE_ICE = false;
 
-    public static final int basicDur = 50000;
+    public static final int basicDur = 10000;
 
     public FmBoatEntity(EntityType<FmBoatEntity> entityType, World world) {
         super(entityType, world);
@@ -306,7 +307,9 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
         super.tick();
         this.updatePositionAndRotation();
-        this.ON_PACKED_ICE=false;
+        //packed ice detected
+        this.ON_PACKED_ICE = this.nearbySlipperiness < 0.98001F && this.nearbySlipperiness > 0.97999F;
+        this.ON_BLUE_ICE = this.nearbySlipperiness < 0.98901F && this.nearbySlipperiness > 0.98899F;
 
         if (this.getTireDur()<=0){
             this.setTireDur(0.0F);
@@ -351,9 +354,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
             if (!(this.getFirstPassenger() instanceof PlayerEntity)) {
                 this.setPaddleMovings(false, false);
             }
-            if (this.nearbySlipperiness < 0.98001F && this.nearbySlipperiness>0.97999F){//packed ice detected
-                this.ON_PACKED_ICE = true;
-            }
             this.updateVelocity();
             this.updatePaddles();
 
@@ -362,7 +362,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
                 this.getWorld().sendPacket(new BoatPaddleStateC2SPacket(this.isPaddleMoving(0), this.isPaddleMoving(1)));
             }
             //Boatire.LOGGER.info(""+this.getTireDur());
-            this.decreaseTireDur(this.getVelocity(),this.getNearbySlipperiness());
+            this.decreaseTireDur();
 
             this.move(MovementType.SELF, this.getVelocity());
         } else {
@@ -382,14 +382,12 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
                         Vec3d vec3d = this.getRotationVec(1.0F);
                         double d = i == 1 ? -vec3d.z : vec3d.z;
                         double e = i == 1 ? vec3d.x : -vec3d.x;
-                        //System.out.println("Silent: " + this.isSilent() + " Category: " + this.getSoundCategory() + " Event: " + soundEvent);
-                        //this.getWorld()
-                        //        .playSound(null, this.getX() + d, this.getY(), this.getZ() + e, soundEvent, SoundCategory.PLAYERS, 1.0F, 0.8F + 0.4F * this.random.nextFloat());
-                        MinecraftClient.getInstance().getSoundManager().play(
-                                new EntityTrackingSoundInstance(soundEvent, SoundCategory.NEUTRAL,
-                                        1.0F, 0.8F + 0.4F * this.random.nextFloat(), this, this.random.nextLong())
-                        );
-
+                        this.getWorld()
+                                .playSound(null, this.getX() + d, this.getY(), this.getZ() + e, soundEvent, SoundCategory.PLAYERS, 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+                        //MinecraftClient.getInstance().getSoundManager().play(
+                        //        new EntityTrackingSoundInstance(soundEvent, SoundCategory.NEUTRAL,
+                        //                1.0F, 0.8F + 0.4F * this.random.nextFloat(), this, this.random.nextLong())
+                        //);
 
                     }
                 }
@@ -1022,63 +1020,63 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     }
 
     public float getModifiedDecay(){
-
-        if (!this.ON_PACKED_ICE)return this.velocityDecay;
+        if (!this.ON_PACKED_ICE && !this.ON_BLUE_ICE)return this.velocityDecay;
         float res = 0;
         if (this.isTireBroken())res+=0.015F;
         if (this.isTireLow())res+=0.01F;
-        switch (this.getLoadedTire()){
-            case 1 : res+=0.9845F;
-            case 2 : res+=0.9825F;
-            case 3 : res+=0.98F;
-            case 4 : res+=0.978F;
-            case 5 : res+=0.975F;
-            default : res=0.98F;
-        }
+        if (this.ON_PACKED_ICE){
+        res += switch (this.getLoadedTire()){
+            case 1 -> 0.9845F;
+            case 2 -> 0.9825F;
+            case 3 -> 0.98F;
+            case 4 -> 0.978F;
+            case 5 -> 0.975F;
+            default -> 0.98F;
+        };}
+        if (this.ON_BLUE_ICE){res += switch (this.getLoadedTire()){
+            case 1 -> 0.990F;
+            case 2 -> 0.9895F;
+            case 3 -> 0.989F;
+            case 4 -> 0.985F;
+            case 5 -> 0.983F;
+            default -> 0.989F;
+        };}
         return res;
     }
     public float getModifiedThrust(){
-        if (!this.ON_PACKED_ICE)return 0.04F;
+        if (!this.ON_PACKED_ICE && !this.ON_BLUE_ICE)return 0.04F;
         float res = 0;
         if (this.isTireBroken())res-=0.03F;
         if (this.isTireLow())res-=0.015F;
-        switch (this.getLoadedTire()){
-            case 1 : res+=0.0335F;
-            case 2 : res+=0.03525F;
-            case 3 : res+=0.04F;
-            case 4 : res+=0.044F;
-            case 5 : res+=0.05F;
-            default : res=0.04F;
-        }
+        res += switch (this.getLoadedTire()){
+            case 1 -> 0.0335F;
+            case 2 -> 0.03525F;
+            case 3 -> 0.04F;
+            case 4 -> 0.044F;
+            case 5 -> 0.05F;
+            default -> 0.04F;
+        };
         return res;
     }
     public float getModifiedBreak(){
-        if (!this.ON_PACKED_ICE)return 0.001F;
-        switch (this.getLoadedTire()){
-            case 1 : return 0.00375F;
-            case 2 : return 0.004375F;
-            case 3 : return 0.005F;
-            case 4 : return 0.0055F;
-            case 5 : return 0.00625F;
-            default : return 0.005F;
-        }
+        if (!this.ON_PACKED_ICE && !this.ON_BLUE_ICE)return 0.001F;
+        return switch (this.getLoadedTire()) {
+            case 1 -> 0.00375F;
+            case 2 -> 0.004375F;
+            case 4 -> 0.0055F;
+            case 5 -> 0.00625F;
+            default -> 0.005F;
+        };
     }
 
     public float getModifiedYawDecay(){
-        if (!this.ON_PACKED_ICE)return this.velocityDecay;
+        if (!this.ON_PACKED_ICE && !this.ON_BLUE_ICE)return this.velocityDecay;
         if (this.isTireBroken())return 0.9F;
-        switch (this.getLoadedTire()){
-            case 1:
-                return 0.977F;
-            case 2:
-                return 0.979F;
-            case 3:
-            case 4:
-            case 5:
-                return 0.98F;
-            default:
-                return 0.98F;
-        }
+        return switch (this.getLoadedTire()) {
+            case 1 -> 0.977F;
+            case 2 -> 0.979F;
+            default -> 0.98F;
+        };
     }
 
     public int getLoadedTire() {return this.dataTracker.get(LOADED_TIRE);}
@@ -1092,38 +1090,44 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
     public void setTireDur(float num){this.dataTracker.set(TIRE_DUR,num);}
 
-    public void decreaseTireDur(Vec3d vecSpd, float frac){
+    public void decreaseTireDur(){
         //spd:block/t
-        float spd = (float) vecSpd.horizontalLength();
-        float yawDec = abs(this.yawVelocity*0.033F);
-        float spdDec = spd+spd*spd*spd/16.0F;
-        float fracDec = (spd > 0.5F && !Float.isNaN(frac) && frac < 0.95F) ? (0.989F - frac)*spd : 0;
-        float newDur = this.getTireDur() - spdDec - fracDec*(FmBoatEntity.basicDur/100) - yawDec;
+        float yawRate = abs(this.yawVelocity);
+        float spd = (float) this.getVelocity().horizontalLength();
+        float frac = this.getNearbySlipperiness();
+        float velocityAngle = (float) Math.toDegrees(Math.atan2(-this.getVelocity().x, this.getVelocity().z));
+
+        float spdDec = (spd > 0.5F) ? spd * spd * 0.01F : 0F;
+        float fracDec = (spd > 0.5F && !Float.isNaN(frac) && frac < 0.95F) ? spd : 0.0F;
+        float yawDec = yawRate*0.01F;
+        float driftDec = (spd < 0.5F && !Float.isNaN(frac) && pressingForward) ? Math.abs(MathHelper.wrapDegrees(this.getYaw()-velocityAngle))*0.005F : 0F;
+
+        float newDur = this.getTireDur() - spdDec - fracDec*(FmBoatEntity.basicDur/500.0F) - yawDec-driftDec;
         if (Float.isNaN(newDur)) newDur = 0;
         this.dataTracker.set(TIRE_DUR, Math.max(0, newDur));
     }
 
     public int getMaxTireDur(int tire){
-        switch (tire){
-            case 1:return basicDur*9/2;
-            case 2:return basicDur*3;
-            case 3:return basicDur*2;
-            case 4:return basicDur*3/2;
-            case 5:return basicDur;
-            default:return basicDur*2;
-        }
+        return switch (tire) {
+            case 1 -> basicDur * 9 / 2;
+            case 2 -> basicDur * 3;
+            case 3 -> basicDur * 2;
+            case 4 -> basicDur * 3 / 2;
+            case 5 -> basicDur;
+            default -> basicDur * 2;
+        };
     }
 
     public int getTireColor(int tire){
-        switch (tire){
-            case 1:return 0xFFFFFFFF;
-            case 2:return 0xFFFFFFE0;
-            case 3:return 0xFFFFF200;
-            case 4:return 0xFFFFC90E;
-            case 5:return 0xFFED1C24;
-            default:return 0xFFFFF200;
-        }
+        return switch (tire) {
+            case 1 -> 0xFFFFFFFF;
+            case 2 -> 0xFFFFFFE0;
+            case 3 -> 0xFFFFF200;
+            case 4 -> 0xFFFFC90E;
+            case 5 -> 0xFFED1C24;
+            default -> 0xFFFFF200;
+        };
     }
-    public boolean isTireLow(){return this.TIRE_LOW;}
-    public boolean isTireBroken(){return this.TIRE_BROKEN;}
+    public boolean isTireLow(){return TIRE_LOW;}
+    public boolean isTireBroken(){return TIRE_BROKEN;}
 }

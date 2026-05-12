@@ -110,11 +110,11 @@ public class BoatireModClient implements ClientModInitializer {
         int screenWidth = client.getWindow().getScaledWidth();
         int x = screenWidth - 10;
         int y = 10;
-        int lenMult = FmBoatEntity.basicDur/1000;
+        int lenMult = 50;//should be 50
 
         int lenDur = floor((boat.getTireDur()/(FmBoatEntity.basicDur*1.0F))*lenMult);
-
         int maxLenDur = floor((boat.getMaxTireDur(boat.getLoadedTire())*1.0F/FmBoatEntity.basicDur)*lenMult);
+        //should be 50px H5 full dur
 
         drawContext.drawHorizontalLine(x - maxLenDur,x,y+font.fontHeight/2,bkgColor);
         drawContext.drawHorizontalLine(x - lenDur,x,y+font.fontHeight/2,durColor);
