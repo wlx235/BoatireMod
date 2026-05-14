@@ -1102,10 +1102,10 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         float frac = this.getNearbySlipperiness();
         float velocityAngle = (float) Math.toDegrees(Math.atan2(-this.getVelocity().x, this.getVelocity().z));
 
-        float spdDec = (spd > 0.5F) ? spd * spd * 0.01F : 0F;
+        float spdDec = (spd > 0.5F) ? spd+spd * spd * 0.1F : 0F;
         float fracDec = (spd > 0.5F && !Float.isNaN(frac) && frac < 0.95F) ? spd : 0.0F;
         float yawDec = yawRate*0.01F;
-        float driftDec = (spd < 0.5F && !Float.isNaN(frac) && pressingForward) ? Math.abs(MathHelper.wrapDegrees(this.getYaw()-velocityAngle))*0.005F : 0F;
+        float driftDec = (!Float.isNaN(frac) && pressingForward) ? Math.abs(MathHelper.wrapDegrees(this.getYaw()-velocityAngle))*0.025F : 0F;
 
         float newDur = this.getTireDur() - spdDec - fracDec*(FmBoatEntity.basicDur/500.0F) - yawDec-driftDec;
         if (Float.isNaN(newDur)) newDur = 0;
