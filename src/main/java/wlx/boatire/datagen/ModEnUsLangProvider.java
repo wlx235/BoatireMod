@@ -18,7 +18,23 @@ public class ModEnUsLangProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.H3_TIRE, "H3 Tire");
         translationBuilder.add(ModItems.H4_TIRE, "H4 Tire");
         translationBuilder.add(ModItems.H5_TIRE, "H5 Tire");
-        translationBuilder.add(ModItems.FM_BOAT_ITEM, "Formula Boat");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_OAK, "Formula Boat");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_WHITE, "Formula Boat(White)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_ORANGE, "Formula Boat (Orange)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_MAGENTA, "Formula Boat (Magenta)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_LIGHT_BLUE, "Formula Boat (Light Blue)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_YELLOW, "Formula Boat (Yellow)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_LIME, "Formula Boat (Lime)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_PINK, "Formula Boat (Pink)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_GRAY, "Formula Boat (Gray)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_LIGHT_GRAY, "Formula Boat (Light Gray)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_CYAN, "Formula Boat (Cyan)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_PURPLE, "Formula Boat (Purple)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_BLUE, "Formula Boat (Blue)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_BROWN, "Formula Boat (Brown)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_GREEN, "Formula Boat (Green)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_RED, "Formula Boat (Red)");
+        translationBuilder.add(ModItems.FM_BOAT_ITEM_BLACK, "Formula Boat (Black)");
 
         translationBuilder.add(ModBlocks.TIRE_CHANGER, "Tire Changer");
         translationBuilder.add(ModBlocks.HIGH_F_ICE, "High Fraction Ice");

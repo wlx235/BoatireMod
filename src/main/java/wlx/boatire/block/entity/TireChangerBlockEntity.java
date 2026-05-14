@@ -18,6 +18,8 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +28,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wlx.boatire.Boatire;
+import wlx.boatire.block.custom.TireChangerBlock;
 import wlx.boatire.entity.custom.FmBoatEntity;
 import wlx.boatire.item.ModItems;
 import wlx.boatire.screen.TireChangerScreenHandler;
@@ -40,6 +43,8 @@ public class TireChangerBlockEntity extends BlockEntity implements ExtendedScree
     //private static final int OUTPUT_SLOT = 2;
     public int tcStatus = 0;
     public int maxTcStatus = 60;
+
+    private int redstonePulseTicks = 0;
 
     protected final PropertyDelegate propertyDelegate;
 
@@ -102,11 +107,22 @@ public class TireChangerBlockEntity extends BlockEntity implements ExtendedScree
         loadedTire = nbt.getInt("tire_changer");
     }
 
-    private List<Item> avPaddles = List.of(ModItems.H1_TIRE, ModItems.H2_TIRE, ModItems.H3_TIRE, ModItems.H4_TIRE, ModItems.H5_TIRE);
+    private final List<Item> avPaddles = List.of(ModItems.H1_TIRE, ModItems.H2_TIRE, ModItems.H3_TIRE, ModItems.H4_TIRE, ModItems.H5_TIRE);
 
     public void tick(World world1, BlockPos pos, BlockState state1){
 
         if (world1.isClient()){return;}
+
+        if (this.redstonePulseTicks > 0) {
+            this.redstonePulseTicks--;
+            if (this.redstonePulseTicks == 0) {
+                // 脉冲结束，关闭红石输出
+                if (world != null) {
+                    world.setBlockState(pos, state1.with(TireChangerBlock.LIT, false));
+                }
+            }
+        }
+
         if (inventory!=null){
             Item inputItem = this.getStack(INPUT_SLOT).getItem();
             if (avPaddles.contains(inputItem)) {//good
@@ -121,21 +137,30 @@ public class TireChangerBlockEntity extends BlockEntity implements ExtendedScree
                 BlockPos centerPos = pos.offset(facing, 2);
                 double range = 1.5;
                 Box box = new Box(centerPos).expand(range);
-                List<FmBoatEntity> boats = world.getEntitiesByClass(FmBoatEntity.class, box, boat -> true);
-
-                if (boats.size()==0){this.resetTcStatus();}
-                else {
-                    if(tcStatus!=maxTcStatus){this.increaseTcStatus();}
-                    else {
-                        for (FmBoatEntity boat : boats) {
-                            if ((boat.getLoadedTire() != loadedTire || boat.getTireDur()<=boat.getMaxTireDur(boat.getLoadedTire())*0.999F)) {
-                                boat.setLoadedTire(loadedTire,true);
-                                //Boatire.LOGGER.info("tc completed!");
-                            }
-                        }
-                        //this.resetTcStatus();
-                    }
+                List<FmBoatEntity> boats = null;
+                if (world != null) {
+                    boats = world.getEntitiesByClass(FmBoatEntity.class, box, boat -> true);
                 }
+                if (boats!=null){
+                    if (boats.isEmpty()){this.resetTcStatus();}
+                    else {
+                        if(tcStatus!=maxTcStatus){this.increaseTcStatus();}
+                        else {
+                            for (FmBoatEntity boat : boats) {
+                                boolean changed = false;
+                                if ((boat.getLoadedTire() != loadedTire || boat.getTireDur()<=boat.getMaxTireDur(boat.getLoadedTire())*0.995F)) {
+                                    boat.setLoadedTire(loadedTire,true);
+                                    //Boatire.LOGGER.info("tc completed!");
+                                    if (world1 instanceof ServerWorld) world1.playSound(null, pos, SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                                }
+                                if (boat.getLoadedTire() != loadedTire || boat.getTireDur()>=boat.getMaxTireDur(boat.getLoadedTire())*0.995F){
+                                    world.setBlockState(pos, state1.with(TireChangerBlock.LIT, true));
+                                    this.redstonePulseTicks=20;
+                                }
+                            }
+                            //this.resetTcStatus();
+                        }
+                    }}
             }
             else {loadedTire=0;this.resetTcStatus();}
         }

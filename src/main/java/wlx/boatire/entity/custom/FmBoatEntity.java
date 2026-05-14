@@ -10,9 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LilyPadBlock;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.sound.EntityTrackingSoundInstance;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -64,7 +62,6 @@ import wlx.boatire.entity.ModEntities;
 import wlx.boatire.item.ModItems;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.cos;
 
 public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.FmType> {
     private static final TrackedData<Integer> DAMAGE_WOBBLE_TICKS = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -189,7 +186,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
     @Override
     public double getMountedHeightOffset() {
-        return this.getVariant() == FmBoatEntity.FmType.BAMBOO ? 0.25 : -0.1;
+        return -0.1;
     }
 
     @Override
@@ -252,7 +249,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     }
 
     public Item asItem() {
-        return ModItems.FM_BOAT_ITEM;
+        return ModItems.FM_BOAT_ITEM_OAK;
     }
 
     @Override
@@ -972,17 +969,25 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
     public static enum FmType implements StringIdentifiable {
         OAK(Blocks.OAK_PLANKS, "oak"),
-        SPRUCE(Blocks.SPRUCE_PLANKS, "spruce"),
-        BIRCH(Blocks.BIRCH_PLANKS, "birch"),
-        JUNGLE(Blocks.JUNGLE_PLANKS, "jungle"),
-        ACACIA(Blocks.ACACIA_PLANKS, "acacia"),
-        CHERRY(Blocks.CHERRY_PLANKS, "cherry"),
-        DARK_OAK(Blocks.DARK_OAK_PLANKS, "dark_oak"),
-        MANGROVE(Blocks.MANGROVE_PLANKS, "mangrove"),
-        BAMBOO(Blocks.BAMBOO_PLANKS, "bamboo");
+        WHITE(Blocks.WHITE_CONCRETE, "white"),
+        ORANGE(Blocks.ORANGE_CONCRETE, "orange"),
+        MAGENTA(Blocks.MAGENTA_CONCRETE, "magenta"),
+        LIGHT_BLUE(Blocks.LIGHT_BLUE_CONCRETE, "light_blue"),
+        YELLOW(Blocks.YELLOW_CONCRETE, "yellow"),
+        LIME(Blocks.LIME_CONCRETE, "lime"),
+        PINK(Blocks.PINK_CONCRETE, "pink"),
+        GRAY(Blocks.GRAY_CONCRETE, "gray"),
+        LIGHT_GRAY(Blocks.LIGHT_GRAY_CONCRETE, "light_gray"),
+        CYAN(Blocks.CYAN_CONCRETE, "cyan"),
+        PURPLE(Blocks.PURPLE_CONCRETE, "purple"),
+        BLUE(Blocks.BLUE_CONCRETE, "blue"),
+        BROWN(Blocks.BROWN_CONCRETE, "brown"),
+        GREEN(Blocks.GREEN_CONCRETE, "green"),
+        RED(Blocks.RED_CONCRETE, "red"),
+        BLACK(Blocks.BLACK_CONCRETE, "black");
 
         private final String name;
-        private final Block baseBlock;
+        private final Block color;
         public static final StringIdentifiable.Codec<FmBoatEntity.FmType> CODEC = StringIdentifiable.createCodec(FmBoatEntity.FmType::values);
         private static final IntFunction<FmBoatEntity.FmType> BY_ID = ValueLists.createIdToValueFunction(
                 FmType::ordinal, values(), ValueLists.OutOfBoundsHandling.ZERO
@@ -990,7 +995,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
         private FmType(Block baseBlock, String name) {
             this.name = name;
-            this.baseBlock = baseBlock;
+            this.color = baseBlock;
         }
 
         @Override
@@ -1003,7 +1008,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         }
 
         public Block getBaseBlock() {
-            return this.baseBlock;
+            return this.color;
         }
 
         public String toString() {

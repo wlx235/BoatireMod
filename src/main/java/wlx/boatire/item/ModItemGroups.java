@@ -36,7 +36,23 @@ public class ModItemGroups {
                             entries.add(ModBlocks.TEST_BLOCK);
                             entries.add(ModBlocks.HIGH_F_ICE);
 
-                            entries.add(ModItems.FM_BOAT_ITEM);
+                            entries.add(ModItems.FM_BOAT_ITEM_OAK);
+                            entries.add(ModItems.FM_BOAT_ITEM_WHITE);
+                            entries.add(ModItems.FM_BOAT_ITEM_ORANGE);
+                            entries.add(ModItems.FM_BOAT_ITEM_MAGENTA);
+                            entries.add(ModItems.FM_BOAT_ITEM_LIGHT_BLUE);
+                            entries.add(ModItems.FM_BOAT_ITEM_YELLOW);
+                            entries.add(ModItems.FM_BOAT_ITEM_LIME);
+                            entries.add(ModItems.FM_BOAT_ITEM_PINK);
+                            entries.add(ModItems.FM_BOAT_ITEM_GRAY);
+                            entries.add(ModItems.FM_BOAT_ITEM_LIGHT_GRAY);
+                            entries.add(ModItems.FM_BOAT_ITEM_CYAN);
+                            entries.add(ModItems.FM_BOAT_ITEM_PURPLE);
+                            entries.add(ModItems.FM_BOAT_ITEM_BLUE);
+                            entries.add(ModItems.FM_BOAT_ITEM_BROWN);
+                            entries.add(ModItems.FM_BOAT_ITEM_GREEN);
+                            entries.add(ModItems.FM_BOAT_ITEM_RED);
+                            entries.add(ModItems.FM_BOAT_ITEM_BLACK);
                             //entries.add(ModItems.TIRE_CHANGER);
                         }).build());
 
