@@ -1031,19 +1031,19 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         if (this.isTireLow())res+=0.01F;
         if (this.ON_PACKED_ICE){
         res += switch (this.getLoadedTire()){
-            case 1 -> 0.9845F;
-            case 2 -> 0.9825F;
+            case 1 -> 0.9815F;
+            case 2 -> 0.9810F;
             case 3 -> 0.98F;
-            case 4 -> 0.978F;
-            case 5 -> 0.975F;
+            case 4 -> 0.9785F;
+            case 5 -> 0.976F;
             default -> 0.98F;
         };}
         if (this.ON_BLUE_ICE){res += switch (this.getLoadedTire()){
             case 1 -> 0.990F;
-            case 2 -> 0.9895F;
+            case 2 -> 0.9894F;
             case 3 -> 0.989F;
-            case 4 -> 0.985F;
-            case 5 -> 0.983F;
+            case 4 -> 0.988F;
+            case 5 -> 0.9866F;
             default -> 0.989F;
         };}
         return res;
@@ -1054,11 +1054,10 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         if (this.isTireBroken())res-=0.03F;
         if (this.isTireLow())res-=0.015F;
         res += switch (this.getLoadedTire()){
-            case 1 -> 0.0335F;
-            case 2 -> 0.03525F;
-            case 3 -> 0.04F;
+            case 1 -> 0.037F;
+            case 2 -> 0.038F;
             case 4 -> 0.044F;
-            case 5 -> 0.05F;
+            case 5 -> 0.048F;
             default -> 0.04F;
         };
         return res;
@@ -1066,8 +1065,8 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     public float getModifiedBreak(){
         if (!this.ON_PACKED_ICE && !this.ON_BLUE_ICE)return 0.001F;
         return switch (this.getLoadedTire()) {
-            case 1 -> 0.00375F;
-            case 2 -> 0.004375F;
+            case 1 -> 0.004F;
+            case 2 -> 0.0045F;
             case 4 -> 0.0055F;
             case 5 -> 0.00625F;
             default -> 0.005F;
@@ -1078,8 +1077,8 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         if (!this.ON_PACKED_ICE && !this.ON_BLUE_ICE)return this.velocityDecay;
         if (this.isTireBroken())return 0.9F;
         return switch (this.getLoadedTire()) {
-            case 1 -> 0.977F;
-            case 2 -> 0.979F;
+            case 1 -> 0.979F;
+            case 2 -> 0.9795F;
             default -> 0.98F;
         };
     }

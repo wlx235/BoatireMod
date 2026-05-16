@@ -42,6 +42,9 @@ public class ModEnUsLangProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItemGroups.BOATIRE_GROUP, "Boatire Items");
 
         translationBuilder.add("hud.boatire.tctext","Tire Changing...");
+        translationBuilder.add("text.autoconfig.boatire.option.showSpeedHud.@Tooltip","Enable Speed Hud");
+        translationBuilder.add("text.autoconfig.boatire.title", "Boatire Settings");
+        translationBuilder.add("text.autoconfig.boatire.option.showSpeedHud", "Enable Speed Hud");
 
     }
 }

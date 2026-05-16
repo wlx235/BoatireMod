@@ -1,5 +1,7 @@
 package wlx.boatire;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;
@@ -22,6 +24,7 @@ public class Boatire implements ModInitializer {
 	public static final Identifier TIRE_CHANGER_SYNC =
 			new Identifier(MOD_ID, "tire_changer_sync");
 	public static final Identifier BOAT_INPUT_SYNC = new Identifier(MOD_ID, "boat_input_sync");
+	public static BoatireConfig config;
 
 	@Override
 	public void onInitialize() {
@@ -37,6 +40,8 @@ public class Boatire implements ModInitializer {
 		ModScreenHandlers.registerScreenHandlers();
 
 		//FabricDefaultAttributeRegistry.register(ModEntities.FM_BOAT1, FmBoatEntity.createBoatAttribute());
+		AutoConfig.register(BoatireConfig.class, JanksonConfigSerializer::new);
+		config = AutoConfig.getConfigHolder(BoatireConfig.class).getConfig();
 
 		LOGGER.info("Hello Fabric world!");
 	}

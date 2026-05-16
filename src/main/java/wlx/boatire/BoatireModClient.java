@@ -108,6 +108,7 @@ public class BoatireModClient implements ClientModInitializer {
         int bkgColor = 0xFF696969;
         int durColor = boat.getTireColor(tireId);
         int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
         int x = screenWidth - 10;
         int y = 10;
         int lenMult = 50;//should be 50
@@ -139,6 +140,18 @@ public class BoatireModClient implements ClientModInitializer {
             drawContext.drawHorizontalLine(x - (100 - lenTc), x, y + font.fontHeight / 2, bkgColor);
             drawContext.drawHorizontalLine(x - 100, x - (100 - lenTc), y + font.fontHeight / 2, tcColor);
         }
+        //SPEEDHUD
+        if (Boatire.config.showSpeedHud) {
+            //获取速度
+            double speed = boat.getVelocity().horizontalLength()*20*3.6;
+            String speedText = String.format("Speed: %.1f kb/h", speed);
 
+            //定位到物品栏正上方中间
+            int y0 = screenHeight - 32;
+            int x0 = screenWidth / 2;
+            int textWidth = font.getWidth(speedText);
+            if (!client.player.isCreative()) y0 -= 18;
+            drawContext.drawText(font, speedText, x0 - textWidth / 2, y0, color, true);
+        }
     }
 }

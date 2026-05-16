@@ -24,5 +24,8 @@
   "item.boatire.h3_tire": "H3 Tire",
   "item.boatire.h4_tire": "H4 Tire",
   "item.boatire.h5_tire": "H5 Tire",
-  "itemGroup.boatire_group": "Boatire Items"
+  "itemGroup.boatire_group": "Boatire Items",
+  "text.autoconfig.boatire.option.showSpeedHud": "Enable Speed Hud",
+  "text.autoconfig.boatire.option.showSpeedHud.@Tooltip": "Enable Speed Hud",
+  "text.autoconfig.boatire.title": "Boatire Settings"
 }
