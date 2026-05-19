@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "boatire:block/timer_starter",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "boatire:block/timer_starter"
+    },
+    "facing=south": {
+      "model": "boatire:block/timer_starter",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boatire:block/timer_starter",
+      "y": 270
+    }
+  }
+}
