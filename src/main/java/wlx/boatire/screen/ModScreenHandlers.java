@@ -11,5 +11,9 @@ public class ModScreenHandlers {
     public static final ScreenHandlerType<TireChangerScreenHandler> TIRE_CHANGER_SCREEN_HANDLER =
             Registry.register(Registries.SCREEN_HANDLER, new Identifier(Boatire.MOD_ID, "tire_changer"),
                     new ExtendedScreenHandlerType<>(TireChangerScreenHandler::new));
+
+    public static final ScreenHandlerType<TimerStarterScreenHandler> TIMER_STARTER_SCREEN_HANDLER =
+            Registry.register(Registries.SCREEN_HANDLER, new Identifier(Boatire.MOD_ID, "timer_starter"),
+                    new ExtendedScreenHandlerType<>(TimerStarterScreenHandler::new));
     public static void registerScreenHandlers(){}
 }

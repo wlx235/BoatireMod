@@ -74,7 +74,10 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
     private static final TrackedData<Integer> LOADED_TIRE = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Float> TIRE_DUR = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.FLOAT);
-
+    private static final TrackedData<Boolean> TIMER_ACTIVE = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Long> TIMER_START_TIME = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.LONG);
+    private static final TrackedData<Long> LAST_CHECKED_TIME = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.LONG);
+    private static final TrackedData<Integer> LAPS_TO_GO = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
 
     public static final int field_30697 = 0;
@@ -158,6 +161,11 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         this.dataTracker.startTracking(BUBBLE_WOBBLE_TICKS, 0);
         this.dataTracker.startTracking(LOADED_TIRE, 3);
         this.dataTracker.startTracking(TIRE_DUR, (float)this.getMaxTireDur(3));
+        this.dataTracker.startTracking(TIMER_ACTIVE, false);
+        this.dataTracker.startTracking(TIMER_START_TIME, getEntityWorld().getTime());
+        this.dataTracker.startTracking(LAST_CHECKED_TIME, getEntityWorld().getTime());
+        this.dataTracker.startTracking(LAPS_TO_GO, 0);
+
     }
 
     @Override
@@ -815,6 +823,9 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         nbt.putString("FmType", this.getVariant().asString());
         nbt.putInt("LoadedTire", this.getLoadedTire());
         nbt.putFloat("TireDur", this.getTireDur());
+        nbt.putBoolean("TimerActive", this.dataTracker.get(TIMER_ACTIVE));
+        nbt.putLong("TimerStartTime", this.dataTracker.get(TIMER_START_TIME));
+        nbt.putLong("LastCheckedTime", this.dataTracker.get(LAST_CHECKED_TIME));
     }
 
     @Override
@@ -828,6 +839,15 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         if (nbt.contains("TireDur")) {
             this.dataTracker.set(TIRE_DUR, nbt.getFloat("TireDur"));
             //Boatire.LOGGER.info("1111  "+this.getTireDur());
+        }
+        if (nbt.contains("TimerActive")){
+            this.dataTracker.set(TIMER_ACTIVE, nbt.getBoolean("TimerActive"));
+        }
+        if (nbt.contains("TimerStartTime")){
+            this.dataTracker.set(TIMER_START_TIME, nbt.getLong("TimerStartTime"));
+        }
+        if (nbt.contains("LastCheckedTime")){
+            this.dataTracker.set(LAST_CHECKED_TIME, nbt.getLong("LastCheckedTime"));
         }
     }
 
@@ -1134,4 +1154,36 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     }
     public boolean isTireLow(){return TIRE_LOW;}
     public boolean isTireBroken(){return TIRE_BROKEN;}
+
+    public void startTimer(int l2go){
+        this.dataTracker.set(TIMER_ACTIVE, true);
+        this.dataTracker.set(TIMER_START_TIME, getEntityWorld().getTime());
+        this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
+        this.dataTracker.set(LAPS_TO_GO, l2go);
+    }
+
+    public void stopTimer(){
+        this.dataTracker.set(TIMER_ACTIVE, false);
+        this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
+    }
+
+    public void resetTimer(){
+        this.dataTracker.set(TIMER_ACTIVE, false);
+        this.dataTracker.set(TIMER_START_TIME, getEntityWorld().getTime());
+        this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
+    }
+
+    public void recordTimer(){
+        this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
+    }
+
+    public long getElapsedTicks(){
+        if (!this.isTimerActive())return this.getLastCheckedTime()-this.getTimerStartTime();
+        return this.getEntityWorld().getTime()-this.getTimerStartTime();
+    }
+    public boolean isTimerActive(){return this.dataTracker.get(TIMER_ACTIVE);}
+    public long getTimerStartTime(){return this.dataTracker.get(TIMER_START_TIME);}
+    public long getLastCheckedTime(){return this.dataTracker.get(LAST_CHECKED_TIME);}
+    public void minusOneLap(){this.dataTracker.set(LAPS_TO_GO, this.dataTracker.get(LAPS_TO_GO)-1);}
+    public int getLapsToGo(){return this.dataTracker.get(LAPS_TO_GO);}
 }

@@ -4,11 +4,15 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wlx.boatire.block.ModBlocks;
 import wlx.boatire.block.entity.ModBlockEntities;
+import wlx.boatire.block.entity.TimerStarterBlockEntity;
 import wlx.boatire.entity.ModEntities;
 import wlx.boatire.item.ModItemGroups;
 import wlx.boatire.item.ModItems;
@@ -24,6 +28,7 @@ public class Boatire implements ModInitializer {
 	public static final Identifier TIRE_CHANGER_SYNC =
 			new Identifier(MOD_ID, "tire_changer_sync");
 	public static final Identifier BOAT_INPUT_SYNC = new Identifier(MOD_ID, "boat_input_sync");
+	public static final Identifier TIMER_STARTER_UPDATE = new Identifier(MOD_ID, "timer_starter_update");
 	public static BoatireConfig config;
 
 	@Override
@@ -42,6 +47,18 @@ public class Boatire implements ModInitializer {
 		//FabricDefaultAttributeRegistry.register(ModEntities.FM_BOAT1, FmBoatEntity.createBoatAttribute());
 		AutoConfig.register(BoatireConfig.class, JanksonConfigSerializer::new);
 		config = AutoConfig.getConfigHolder(BoatireConfig.class).getConfig();
+
+		ServerPlayNetworking.registerGlobalReceiver(TIMER_STARTER_UPDATE, (server, player, handler, buf, responseSender) -> {
+			BlockPos pos = buf.readBlockPos();
+			int detectLength = buf.readInt();
+			int lapsGo = buf.readInt();
+			server.execute(() -> {
+				World world = server.getWorld(player.getSpawnPointDimension());
+				if (world.getBlockEntity(pos) instanceof TimerStarterBlockEntity be) {
+					be.setFields(detectLength, lapsGo); // 待添加的方法
+				}
+			});
+		});
 
 		LOGGER.info("Hello Fabric world!");
 	}

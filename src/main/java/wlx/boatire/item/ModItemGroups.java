@@ -35,6 +35,7 @@ public class ModItemGroups {
                             entries.add(ModBlocks.TIRE_CHANGER);
                             entries.add(ModBlocks.TEST_BLOCK);
                             entries.add(ModBlocks.HIGH_F_ICE);
+                            entries.add(ModBlocks.TIMER_STARTER);
 
                             entries.add(ModItems.FM_BOAT_ITEM_OAK);
                             entries.add(ModItems.FM_BOAT_ITEM_WHITE);

@@ -38,6 +38,7 @@ public class ModEnUsLangProvider extends FabricLanguageProvider {
 
         translationBuilder.add(ModBlocks.TIRE_CHANGER, "Tire Changer");
         translationBuilder.add(ModBlocks.HIGH_F_ICE, "High Fraction Ice");
+        translationBuilder.add(ModBlocks.TIMER_STARTER, "BoatTimer Starter");
 
         translationBuilder.add(ModItemGroups.BOATIRE_GROUP, "Boatire Items");
 
@@ -45,6 +46,9 @@ public class ModEnUsLangProvider extends FabricLanguageProvider {
         translationBuilder.add("text.autoconfig.boatire.option.showSpeedHud.@Tooltip","Enable Speed Hud");
         translationBuilder.add("text.autoconfig.boatire.title", "Boatire Settings");
         translationBuilder.add("text.autoconfig.boatire.option.showSpeedHud", "Enable Speed Hud");
+
+        translationBuilder.add("hud.boatire.tcblock.text", "Tire Changer");
+        translationBuilder.add("hud.boatire.timerstarter.title", "Starter");
 
     }
 }

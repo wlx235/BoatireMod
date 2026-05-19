@@ -1,7 +1,10 @@
 {
   "block.boatire.high_f_ice": "High Fraction Ice",
+  "block.boatire.timer_starter": "BoatTimer Starter",
   "block.boatire.tire_changer": "Tire Changer",
+  "hud.boatire.tcblock.text": "Tire Changer",
   "hud.boatire.tctext": "Tire Changing...",
+  "hud.boatire.timerstarter.title": "Starter",
   "item.boatire.fm_boat_black": "Formula Boat (Black)",
   "item.boatire.fm_boat_blue": "Formula Boat (Blue)",
   "item.boatire.fm_boat_brown": "Formula Boat (Brown)",

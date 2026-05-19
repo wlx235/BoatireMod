@@ -1,13 +1,15 @@
-// 1.20.1	2026-05-16T21:20:13.9735085	boatire/Model Definitions
+// 1.20.1	2026-05-19T22:28:11.159251	boatire/Model Definitions
 9235b10971168aa8189731e0e00732c142d976c3 assets\boatire\models\item\h1_tire.json
 d8811617bdb66a6c26d0e2aee41a27bc9c8e3980 assets\boatire\models\item\h2_tire.json
-8d1a565c0ec4d567b9ea180806872e5d47f031fb assets\boatire\models\item\h3_tire.json
 de4693fc5586d020b2506f39c22cbefb4b793782 assets\boatire\models\item\tire_changer.json
+8d1a565c0ec4d567b9ea180806872e5d47f031fb assets\boatire\models\item\h3_tire.json
 c17b78554799de6ab09dc55cf0045983af1ac62f assets\boatire\models\item\test.json
 88507f7a833d2bc33aac096fd03d48cbf561ef56 assets\boatire\models\item\h4_tire.json
 dde24688f15f938284e616cf4847b7d8feff0e97 assets\boatire\blockstates\high_f_ice.json
+71d61c3903cd228259b3f6fde7fd0c11f16eb397 assets\boatire\blockstates\timer_starter.json
 8be8e09936e51f399d15c2d254cd6b5d8e30fe65 assets\boatire\blockstates\tire_changer.json
 8d35274b3f73692c3ddf665c8c227828610162ae assets\boatire\models\item\h5_tire.json
 b52ec208dee7a4c4e59046fb55e997ed52a850bb assets\boatire\models\item\high_f_ice.json
 83cf252768b01ed5a3bcc7a4cb786fce4f132736 assets\boatire\blockstates\test.json
 41c9b913f56c40812291c0fa6d51fbab934eda30 assets\boatire\models\block\high_f_ice.json
+6af070d8752a9f5e1c562f5d874aa566adcb239e assets\boatire\models\item\timer_starter.json

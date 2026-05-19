@@ -101,5 +101,5 @@ public class TireChangerBlock extends BlockWithEntity implements BlockEntityProv
         return checkType(type, ModBlockEntities.TIRE_CHANGER_BLOCK_ENTITY,
                 (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1));
     }
-
+    //checkType = validateTicker in 1.20.2
 }

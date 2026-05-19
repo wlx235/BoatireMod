@@ -12,15 +12,15 @@ import wlx.boatire.Boatire;
 public class TireChangerScreen extends HandledScreen<TireChangerScreenHandler> {
     private static final Identifier TEXTURE = new Identifier(Boatire.MOD_ID, "textures/gui/tire_changer_gui.png");
 
-    public  TireChangerScreen(TireChangerScreenHandler handler, PlayerInventory inventory, Text title){
+    public TireChangerScreen(TireChangerScreenHandler handler, PlayerInventory inventory, Text title){
         super(handler, inventory, title);
     }
 
     @Override
     protected void init(){
         super.init();
-        titleY = 1000;
-        playerInventoryTitleY = 1000;
+        titleY = 6;
+        playerInventoryTitleY = this.backgroundHeight - 96;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class TireChangerScreen extends HandledScreen<TireChangerScreenHandler> {
 
     private void renderTireColor(DrawContext context, int x, int y){
         if (handler.isLoaded()){
-            context.drawTexture(TEXTURE, x+7, y+66, 6, handler.getBarPos(), 162, 5);
+            context.drawTexture(TEXTURE, x+7, y+50, 6, handler.getBarPos(), 162, 5);
         }
     }
 

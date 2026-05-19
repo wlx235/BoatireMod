@@ -20,6 +20,7 @@ import wlx.boatire.entity.custom.FmBoatEntity;
 import wlx.boatire.entity.custom.FmBoatEntityModel;
 import wlx.boatire.entity.custom.FmBoatEntityRenderer;
 import wlx.boatire.screen.ModScreenHandlers;
+import wlx.boatire.screen.TimerStarterScreen;
 import wlx.boatire.screen.TireChangerScreen;
 
 import static net.minecraft.util.math.MathHelper.ceil;
@@ -33,6 +34,7 @@ public class BoatireModClient implements ClientModInitializer {
     public void onInitializeClient() {
 
         HandledScreens.register(ModScreenHandlers.TIRE_CHANGER_SCREEN_HANDLER, TireChangerScreen::new);
+        HandledScreens.register(ModScreenHandlers.TIMER_STARTER_SCREEN_HANDLER, TimerStarterScreen::new);
 
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.FM_BOAT_1, FmBoatEntityModel::getTexturedModelData);
 
@@ -141,17 +143,25 @@ public class BoatireModClient implements ClientModInitializer {
             drawContext.drawHorizontalLine(x - 100, x - (100 - lenTc), y + font.fontHeight / 2, tcColor);
         }
         //SPEEDHUD
+        //定位到物品栏正上方中间
+        int y0 = screenHeight - 2 - font.fontHeight;
+        int x0 = screenWidth - 2;
         if (Boatire.config.showSpeedHud) {
             //获取速度
             double speed = boat.getVelocity().horizontalLength()*20*3.6;
-            String speedText = String.format("Speed: %.1f kb/h", speed);
-
-            //定位到物品栏正上方中间
-            int y0 = screenHeight - 32;
-            int x0 = screenWidth / 2;
-            int textWidth = font.getWidth(speedText);
-            if (!client.player.isCreative()) y0 -= 18;
-            drawContext.drawText(font, speedText, x0 - textWidth / 2, y0, color, true);
+            String speedText = String.format("%.1f kb/h", speed);
+            //if (!client.player.isCreative()) y0 -= 18;
+            drawContext.drawText(font, speedText, x0 - 112, y0, color, true);
+            //y0 -= font.fontHeight+2;
         }
+        //TIMERHUD
+        long elTicks = boat.getElapsedTicks();
+        int timerColor1 = 0xFF33FF33;
+        String timerText = ((elTicks>=72000)?elTicks/72000+":":"") +
+                String.format("%02d", (elTicks%72000)/1200)+":"+
+                String.format("%02d", (elTicks%1200)/20)+":"+
+                String.format("%02d", elTicks%20*5);//(h+":")
+        drawContext.drawText(font, timerText, x0 - font.getWidth(timerText), y0, timerColor1, false);
+
     }
 }

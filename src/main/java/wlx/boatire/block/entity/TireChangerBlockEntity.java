@@ -80,7 +80,7 @@ public class TireChangerBlockEntity extends BlockEntity implements ExtendedScree
 
     @Override
     public Text getDisplayName() {
-        return Text.literal("Tire Changer");
+        return Text.translatable("hud.boatire.tcblock.text");
     }
 
     @Nullable
