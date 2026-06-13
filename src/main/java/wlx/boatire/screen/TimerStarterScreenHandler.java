@@ -9,11 +9,15 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import wlx.boatire.block.entity.TimerStarterBlockEntity;
+import wlx.boatire.util.BoatInfo;
+
+import java.util.List;
 
 public class TimerStarterScreenHandler extends ScreenHandler {
     private final BlockPos pos;
     private final int initialDetect;
     private final int initialLaps;
+    private List<BoatInfo> boatList = List.of();
 
     public TimerStarterScreenHandler(int syncId, PlayerInventory inv, BlockEntity blockEntity) {
         super(ModScreenHandlers.TIMER_STARTER_SCREEN_HANDLER, syncId);
@@ -35,6 +39,10 @@ public class TimerStarterScreenHandler extends ScreenHandler {
     public BlockPos getPos() { return pos; }
     public int getInitialDetect() { return initialDetect; }
     public int getInitialLaps() { return initialLaps; }
+    public List<BoatInfo> getBoatList() { return boatList; }
+    public void updateBoatList(List<BoatInfo> list) {
+        this.boatList = list;
+    }
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int slot) {
@@ -56,4 +64,5 @@ public class TimerStarterScreenHandler extends ScreenHandler {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
     }
+
 }

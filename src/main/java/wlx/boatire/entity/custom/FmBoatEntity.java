@@ -40,6 +40,7 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.StringIdentifiable;
@@ -136,7 +137,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
     @Override
     public boolean isLogicalSideForUpdatingMovement() {
-        // 原版船的运作方式：服务端和客户端都要进行物理运算
         return true;
     }
 
@@ -333,16 +333,14 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
             LivingEntity driver = this.getControllingPassenger();
             if (driver instanceof PlayerEntity player) {
                 if (this.getWorld().isClient && player instanceof ClientPlayerEntity clientPlayer) {
-                    // 客户端：从 ClientPlayerEntity 读取输入
                     boolean l = clientPlayer.input.pressingLeft;
                     boolean r = clientPlayer.input.pressingRight;
                     boolean f = clientPlayer.input.pressingForward;
                     boolean b = clientPlayer.input.pressingBack;
 
-                    // 设置本地（客户端预测）
                     this.setInputs(l, r, f, b);
 
-                    // 发送给服务端
+                    //发送给服务端
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeInt(this.getId());
                     buf.writeBoolean(l);
@@ -351,7 +349,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
                     buf.writeBoolean(b);
                     ClientPlayNetworking.send(Boatire.BOAT_INPUT_SYNC, buf);
                 }
-                // 服务端不在这里设置，等待包到达后设置
             } else {
                 this.setInputs(false, false, false, false);
             }
@@ -1160,6 +1157,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         this.dataTracker.set(TIMER_START_TIME, getEntityWorld().getTime());
         this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
         this.dataTracker.set(LAPS_TO_GO, l2go);
+        Boatire.LOGGER.info("timer_start,laps2go:"+l2go);
     }
 
     public void stopTimer(){
@@ -1186,4 +1184,26 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     public long getLastCheckedTime(){return this.dataTracker.get(LAST_CHECKED_TIME);}
     public void minusOneLap(){this.dataTracker.set(LAPS_TO_GO, this.dataTracker.get(LAPS_TO_GO)-1);}
     public int getLapsToGo(){return this.dataTracker.get(LAPS_TO_GO);}
+
+    public int getBoatColorHex(){
+        return switch (this.getVariant().getName()){
+            case "black" -> 0xFF000000;
+            case "blue" -> 0xFF3F48CC;
+            case "brown" -> 0xFFB97A57;
+            case "cyan" -> 0xFF4546D0;
+            case "gray" -> 0xFF7F7F7F;
+            case "green" -> 0xFF22B14C;
+            case "light_blue" -> 0xFF00A2E8;
+            case "light_gray" -> 0xFFDBDBDB;
+            case "lime" -> 0xFFB5E61D;
+            case "magenta" -> 0xFFEA3FF7;
+            case "orange" -> 0xFFFF7F27;
+            case "pink" -> 0xFFFFCFE4;
+            case "purple" -> 0xFFA349A4;
+            case "red" -> 0xFFED1C24;
+            case "white" -> 0xFFFFFFFF;
+            case "yellow" -> 0xFFFFF200;
+            default -> 0xFFD7C185;
+        };
+    }
 }

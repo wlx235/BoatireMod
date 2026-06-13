@@ -2,6 +2,7 @@ package wlx.boatire.screen;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -10,6 +11,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import wlx.boatire.Boatire;
+import wlx.boatire.util.BoatInfo;
+
+import java.util.List;
+
+import static java.lang.Math.min;
 
 public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler> {
     private static final Identifier TEXTURE = new Identifier(Boatire.MOD_ID, "textures/gui/boat_timer_starter_gui.png");
@@ -29,7 +35,6 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
 
-        // 从 Handler 获取初始值（不再使用 PropertyDelegate）
         int initDetect = this.handler.getInitialDetect();
         int initLaps   = this.handler.getInitialLaps();
 
@@ -57,7 +62,7 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
         if (text.isEmpty()) return min;
         try {
             int val = Integer.parseInt(text);
-            return Math.max(min, Math.min(val, max));
+            return Math.max(min, min(val, max));
         } catch (NumberFormatException e) {
             return min;
         }
@@ -75,12 +80,13 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
         renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
         drawMouseoverTooltip(context, mouseX, mouseY);
+        renderBoatContent(context);
     }
 
     @Override
     public void close() {
-        int detect = clampInt(this.detectLengthField != null ? this.detectLengthField.getText() : "3", 0, 32);
-        int laps   = clampInt(this.lapsGoField != null ? this.lapsGoField.getText() : "0", 0, 99);
+        int detect = clampInt(this.detectLengthField != null ? this.detectLengthField.getText() : "3", 1, 32);
+        int laps = clampInt(this.lapsGoField != null ? this.lapsGoField.getText() : "0", 0, 99);
 
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBlockPos(this.handler.getPos());
@@ -88,6 +94,21 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
         buf.writeInt(laps);
         ClientPlayNetworking.send(Boatire.TIMER_STARTER_UPDATE, buf);
         super.close();
+    }
+
+    public void renderBoatContent(DrawContext context){
+        List<BoatInfo> boats = handler.getBoatList();
+        int startX = (width - backgroundWidth) / 2 + 58;
+        int startY = (height - backgroundHeight) / 2 + 12;
+        int lineHeight = 8;
+        for (int i = 0;i < min(boats.size(),10);i++) {
+            if (i >= 7 && startX == (width - backgroundWidth) / 2 + 58){startX += 54;startY -= lineHeight*7;}
+            BoatInfo info = boats.get(i);
+            int y = startY + lineHeight*i + 1;
+            context.fill(startX + 1, y, startX + 11, y + lineHeight - 1, info.color() | 0xFF000000);
+            context.drawText(textRenderer, Text.literal(info.driver()), startX + 13, y, 0xFFFFFFFF, true);
+        }
+
     }
 
 }

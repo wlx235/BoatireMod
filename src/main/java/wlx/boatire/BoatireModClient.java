@@ -22,10 +22,15 @@ import wlx.boatire.entity.custom.FmBoatEntityRenderer;
 import wlx.boatire.screen.ModScreenHandlers;
 import wlx.boatire.screen.TimerStarterScreen;
 import wlx.boatire.screen.TireChangerScreen;
+import wlx.boatire.util.BoatInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.minecraft.util.math.MathHelper.ceil;
 import static net.minecraft.util.math.MathHelper.floor;
 import static wlx.boatire.Boatire.BOAT_INPUT_SYNC;
+import static wlx.boatire.Boatire.TIMER_STARTER_BOAT_INFO_SYNC;
 
 public class BoatireModClient implements ClientModInitializer {
 
@@ -72,6 +77,24 @@ public class BoatireModClient implements ClientModInitializer {
             server.execute(() -> {
                 if (player.getWorld().getEntityById(entityId) instanceof FmBoatEntity boat) {
                     boat.setInputs(l, r, f, b);
+                }
+            });
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(TIMER_STARTER_BOAT_INFO_SYNC, (client, handler, buf, responseSender) -> {
+            BlockPos pos = buf.readBlockPos();
+            int count = buf.readInt();
+            List<BoatInfo> list = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                int color = buf.readInt();
+                String name = buf.readString();
+                list.add(new BoatInfo(color, name));
+            }
+            client.execute(() -> {
+                if (client.currentScreen instanceof TimerStarterScreen screen) {
+                    if (screen.getScreenHandler().getPos().equals(pos)) {
+                        screen.getScreenHandler().updateBoatList(list);
+                    }
                 }
             });
         });
@@ -143,11 +166,9 @@ public class BoatireModClient implements ClientModInitializer {
             drawContext.drawHorizontalLine(x - 100, x - (100 - lenTc), y + font.fontHeight / 2, tcColor);
         }
         //SPEEDHUD
-        //定位到物品栏正上方中间
         int y0 = screenHeight - 2 - font.fontHeight;
         int x0 = screenWidth - 2;
         if (Boatire.config.showSpeedHud) {
-            //获取速度
             double speed = boat.getVelocity().horizontalLength()*20*3.6;
             String speedText = String.format("%.1f kb/h", speed);
             //if (!client.player.isCreative()) y0 -= 18;
