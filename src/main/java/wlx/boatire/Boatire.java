@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import wlx.boatire.block.ModBlocks;
 import wlx.boatire.block.entity.ModBlockEntities;
 import wlx.boatire.block.entity.TimerStarterBlockEntity;
+import wlx.boatire.block.entity.TimerStopperBlockEntity;
 import wlx.boatire.entity.ModEntities;
 import wlx.boatire.item.ModItemGroups;
 import wlx.boatire.item.ModItems;
@@ -30,6 +31,8 @@ public class Boatire implements ModInitializer {
 	public static final Identifier BOAT_INPUT_SYNC = new Identifier(MOD_ID, "boat_input_sync");
 	public static final Identifier TIMER_STARTER_UPDATE = new Identifier(MOD_ID, "timer_starter_update");
 	public static final Identifier TIMER_STARTER_BOAT_INFO_SYNC = new Identifier(MOD_ID, "timer_starter_boat_info_sync");
+	public static final Identifier TIMER_STOPPER_UPDATE = new Identifier(MOD_ID, "timer_stopper_update");
+	public static final Identifier TIMER_STOPPER_BOAT_INFO_SYNC = new Identifier(MOD_ID, "timer_stopper_boat_info_sync");
 	public static BoatireConfig config;
 
 	@Override
@@ -55,13 +58,26 @@ public class Boatire implements ModInitializer {
 			int lapsGo = buf.readInt();
 			server.execute(() -> {
 				World world = server.getWorld(player.getSpawnPointDimension());
-				if (world.getBlockEntity(pos) instanceof TimerStarterBlockEntity be) {
-					be.setFields(detectLength, lapsGo); // 待添加的方法
-				}
-			});
+                if (world != null && world.getBlockEntity(pos) instanceof TimerStarterBlockEntity be) {
+                    be.setFields(detectLength, lapsGo);
+                }
+            });
 		});
 
 		ServerPlayNetworking.registerGlobalReceiver(TIMER_STARTER_BOAT_INFO_SYNC, (server, player, handler, buf, responseSender) -> {});
+
+		ServerPlayNetworking.registerGlobalReceiver(TIMER_STOPPER_UPDATE, (server, player, handler, buf, responseSender) -> {
+			BlockPos pos = buf.readBlockPos();
+			int detectLength = buf.readInt();
+			server.execute(() -> {
+				World world = server.getWorld(player.getSpawnPointDimension());
+                if (world != null && world.getBlockEntity(pos) instanceof TimerStopperBlockEntity be) {
+                    be.setFields(detectLength);
+                }
+            });
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(TIMER_STOPPER_BOAT_INFO_SYNC, (server, player, handler, buf, responseSender) -> {});
 
 		LOGGER.info("Hello Fabric world!");
 	}

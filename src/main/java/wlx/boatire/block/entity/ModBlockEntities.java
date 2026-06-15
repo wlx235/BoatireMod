@@ -18,5 +18,9 @@ public class ModBlockEntities {
             Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(Boatire.MOD_ID, "timer_starter_block_entity"),
                     FabricBlockEntityTypeBuilder.create(TimerStarterBlockEntity::new, ModBlocks.TIMER_STARTER).build());
 
+    public static final BlockEntityType<TimerStopperBlockEntity> TIMER_STOPPER_BLOCK_ENTITY =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(Boatire.MOD_ID, "timer_stoppper_block_entity"),
+                    FabricBlockEntityTypeBuilder.create(TimerStopperBlockEntity::new, ModBlocks.TIMER_STOPPER).build());
+
     public static void registerBlockEntities(){}
 }

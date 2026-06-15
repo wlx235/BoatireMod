@@ -15,5 +15,10 @@ public class ModScreenHandlers {
     public static final ScreenHandlerType<TimerStarterScreenHandler> TIMER_STARTER_SCREEN_HANDLER =
             Registry.register(Registries.SCREEN_HANDLER, new Identifier(Boatire.MOD_ID, "timer_starter"),
                     new ExtendedScreenHandlerType<>(TimerStarterScreenHandler::new));
+
+    public static final ScreenHandlerType<TimerStopperScreenHandler> TIMER_STOPPER_SCREEN_HANDLER =
+            Registry.register(Registries.SCREEN_HANDLER, new Identifier(Boatire.MOD_ID, "timer_stopper"),
+                    new ExtendedScreenHandlerType<>(TimerStopperScreenHandler::new));
+
     public static void registerScreenHandlers(){}
 }

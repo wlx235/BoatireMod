@@ -2,6 +2,7 @@ package wlx.boatire.entity.custom;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.IntFunction;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -40,7 +41,6 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.StringIdentifiable;
@@ -78,7 +78,9 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     private static final TrackedData<Boolean> TIMER_ACTIVE = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Long> TIMER_START_TIME = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.LONG);
     private static final TrackedData<Long> LAST_CHECKED_TIME = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.LONG);
+    private static final TrackedData<Long> LAST_LAP_TIME = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.LONG);
     private static final TrackedData<Integer> LAPS_TO_GO = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Boolean> IN_DETECT_AREA = DataTracker.registerData(FmBoatEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 
     public static final int field_30697 = 0;
@@ -119,6 +121,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
     private boolean TIRE_LOW = false;
     private boolean ON_PACKED_ICE = false;
     private boolean ON_BLUE_ICE = false;
+    private int detectCount = 0;
 
     public static final int basicDur = 10000;
 
@@ -165,6 +168,8 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         this.dataTracker.startTracking(TIMER_START_TIME, getEntityWorld().getTime());
         this.dataTracker.startTracking(LAST_CHECKED_TIME, getEntityWorld().getTime());
         this.dataTracker.startTracking(LAPS_TO_GO, 0);
+        this.dataTracker.startTracking(IN_DETECT_AREA, false);
+        this.dataTracker.startTracking(LAST_LAP_TIME, 0L);
 
     }
 
@@ -363,7 +368,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
                 this.getWorld().sendPacket(new BoatPaddleStateC2SPacket(this.isPaddleMoving(0), this.isPaddleMoving(1)));
             }
-            //Boatire.LOGGER.info(""+this.getTireDur());
             this.decreaseTireDur();
 
             this.move(MovementType.SELF, this.getVelocity());
@@ -823,6 +827,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         nbt.putBoolean("TimerActive", this.dataTracker.get(TIMER_ACTIVE));
         nbt.putLong("TimerStartTime", this.dataTracker.get(TIMER_START_TIME));
         nbt.putLong("LastCheckedTime", this.dataTracker.get(LAST_CHECKED_TIME));
+        nbt.putLong("LastLapTime", this.dataTracker.get(LAST_LAP_TIME));
     }
 
     @Override
@@ -835,7 +840,6 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         }
         if (nbt.contains("TireDur")) {
             this.dataTracker.set(TIRE_DUR, nbt.getFloat("TireDur"));
-            //Boatire.LOGGER.info("1111  "+this.getTireDur());
         }
         if (nbt.contains("TimerActive")){
             this.dataTracker.set(TIMER_ACTIVE, nbt.getBoolean("TimerActive"));
@@ -845,6 +849,9 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         }
         if (nbt.contains("LastCheckedTime")){
             this.dataTracker.set(LAST_CHECKED_TIME, nbt.getLong("LastCheckedTime"));
+        }
+        if (nbt.contains("LastLapTime")){
+            this.dataTracker.set(LAST_LAP_TIME, nbt.getLong("LastLapTime"));
         }
     }
 
@@ -1160,9 +1167,8 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         Boatire.LOGGER.info("timer_start,laps2go:"+l2go);
     }
 
-    public void stopTimer(){
+    public void pauseTimer(){
         this.dataTracker.set(TIMER_ACTIVE, false);
-        this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
     }
 
     public void resetTimer(){
@@ -1171,7 +1177,8 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
     }
 
-    public void recordTimer(){
+    public void recordLastLapTime(){
+        this.dataTracker.set(LAST_LAP_TIME, getEntityWorld().getTime()-this.getLastCheckedTime());
         this.dataTracker.set(LAST_CHECKED_TIME, getEntityWorld().getTime());
     }
 
@@ -1206,4 +1213,21 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
             default -> 0xFFD7C185;
         };
     }
+
+    public void setInDetectArea(boolean val){this.dataTracker.set(IN_DETECT_AREA, val);}
+    public boolean getInDetectArea(){return this.dataTracker.get(IN_DETECT_AREA);}
+
+    public void incDetectCount(){
+        this.detectCount++;
+        if(this.detectCount==1)this.setInDetectArea(true);
+    }
+
+    public void decDetectCount(){
+        this.detectCount--;
+        if(this.detectCount==0)this.setInDetectArea(false);
+    }
+
+    public long getLastLapTime(){return this.dataTracker.get(LAST_LAP_TIME);}
+
+    public boolean isTimerZero(){return (Objects.equals(this.dataTracker.get(TIMER_START_TIME), this.dataTracker.get(LAST_CHECKED_TIME)));}
 }

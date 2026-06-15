@@ -21,16 +21,17 @@ import wlx.boatire.entity.custom.FmBoatEntityModel;
 import wlx.boatire.entity.custom.FmBoatEntityRenderer;
 import wlx.boatire.screen.ModScreenHandlers;
 import wlx.boatire.screen.TimerStarterScreen;
+import wlx.boatire.screen.TimerStopperScreen;
 import wlx.boatire.screen.TireChangerScreen;
 import wlx.boatire.util.BoatInfo;
+import wlx.boatire.util.TimerRecord;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static net.minecraft.util.math.MathHelper.ceil;
 import static net.minecraft.util.math.MathHelper.floor;
-import static wlx.boatire.Boatire.BOAT_INPUT_SYNC;
-import static wlx.boatire.Boatire.TIMER_STARTER_BOAT_INFO_SYNC;
+import static wlx.boatire.Boatire.*;
 
 public class BoatireModClient implements ClientModInitializer {
 
@@ -40,6 +41,7 @@ public class BoatireModClient implements ClientModInitializer {
 
         HandledScreens.register(ModScreenHandlers.TIRE_CHANGER_SCREEN_HANDLER, TireChangerScreen::new);
         HandledScreens.register(ModScreenHandlers.TIMER_STARTER_SCREEN_HANDLER, TimerStarterScreen::new);
+        HandledScreens.register(ModScreenHandlers.TIMER_STOPPER_SCREEN_HANDLER, TimerStopperScreen::new);
 
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.FM_BOAT_1, FmBoatEntityModel::getTexturedModelData);
 
@@ -98,6 +100,28 @@ public class BoatireModClient implements ClientModInitializer {
                 }
             });
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(TIMER_STOPPER_BOAT_INFO_SYNC, (client, handler, buf, responseSender) -> {
+            BlockPos pos = buf.readBlockPos();
+            int count = buf.readInt();
+            List<TimerRecord> list = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                int color = buf.readInt();
+                String name = buf.readString();
+                Long recordTime = buf.readLong();
+                int textColor = buf.readInt();
+                list.add(new TimerRecord(color, name, recordTime, textColor));
+            }
+            client.execute(() -> {
+                if (client.currentScreen instanceof TimerStopperScreen screen) {
+                    System.out.println(11);
+                    if (screen.getScreenHandler().getPos().equals(pos)) {
+                        screen.getScreenHandler().updateBoatList(list);
+
+                    }
+                }
+            });
+        });
     }
 
     private void renderBoatHud(DrawContext drawContext) {
@@ -145,14 +169,13 @@ public class BoatireModClient implements ClientModInitializer {
         drawContext.drawHorizontalLine(x - maxLenDur,x,y+font.fontHeight/2,bkgColor);
         drawContext.drawHorizontalLine(x - lenDur,x,y+font.fontHeight/2,durColor);
 
-        String tireText = tireName;
-        drawContext.drawText(font, Text.literal(tireText),
-                x - font.getWidth(tireText)-maxLenDur-6, y, color, true);
+        drawContext.drawText(font, Text.literal(tireName),
+                x - font.getWidth(tireName)-maxLenDur-6, y, color, true);
 
         if (boat.isTireLow()){drawContext.drawText(font, Text.literal("L"),
-                x - font.getWidth(tireText)-maxLenDur-11-font.getWidth("L"), y, 0xFFFFA500, true);}
+                x - font.getWidth(tireName)-maxLenDur-11-font.getWidth("L"), y, 0xFFFFA500, true);}
         if (boat.isTireBroken()){drawContext.drawText(font, Text.literal("D"),
-                x - font.getWidth(tireText)-maxLenDur-11-font.getWidth("D"), y, 0xFFAB0000, true);}
+                x - font.getWidth(tireName)-maxLenDur-11-font.getWidth("D"), y, 0xFFAB0000, true);}
 
         float maxTcStat = 60.0F;
         y += font.fontHeight + 2;
@@ -176,13 +199,25 @@ public class BoatireModClient implements ClientModInitializer {
             //y0 -= font.fontHeight+2;
         }
         //TIMERHUD
-        long elTicks = boat.getElapsedTicks();
-        int timerColor1 = 0xFF33FF33;
-        String timerText = ((elTicks>=72000)?elTicks/72000+":":"") +
-                String.format("%02d", (elTicks%72000)/1200)+":"+
-                String.format("%02d", (elTicks%1200)/20)+":"+
-                String.format("%02d", elTicks%20*5);//(h+":")
-        drawContext.drawText(font, timerText, x0 - font.getWidth(timerText), y0, timerColor1, false);
-
+        if (Boatire.config.showTimerHud) {
+            if (boat.getInDetectArea() || boat.isTimerActive() || !boat.isTimerZero()) {
+                long elTicks = boat.getElapsedTicks();
+                int timerColor1 = (boat.isTimerActive())?0xFF33FF33:0xFFFFFFFF;
+                int timerColor2 = 0xFFFFFF33;
+                String timerText = ((elTicks >= 72000) ? elTicks / 72000 + ":" : "") +
+                        String.format("%02d", (elTicks % 72000) / 1200) + ":" +
+                        String.format("%02d", (elTicks % 1200) / 20) + ":" +
+                        String.format("%02d", elTicks % 20 * 5);//(h+":")
+                drawContext.drawText(font, timerText, x0 - font.getWidth(timerText), y0, timerColor1, false);
+                long lastLapTime = boat.getLastLapTime();
+                if (lastLapTime!=0){
+                    String timerText2 = ((lastLapTime >= 72000) ? lastLapTime / 72000 + ":" : "") +
+                            String.format("%02d", (lastLapTime % 72000) / 1200) + ":" +
+                            String.format("%02d", (lastLapTime % 1200) / 20) + ":" +
+                            String.format("%02d", lastLapTime % 20 * 5);//(h+":")
+                    drawContext.drawText(font, timerText2, x0 - font.getWidth(timerText2), y0-font.fontHeight, timerColor2, false);
+                }
+            }
+        }
     }
 }

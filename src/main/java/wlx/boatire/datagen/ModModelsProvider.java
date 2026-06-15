@@ -20,6 +20,7 @@ public class ModModelsProvider extends FabricModelProvider {
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TIRE_CHANGER);
         blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.HIGH_F_ICE);
         blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TIMER_STARTER);
+        blockStateModelGenerator.registerNorthDefaultHorizontalRotation(ModBlocks.TIMER_STOPPER);
     }
 
     @Override

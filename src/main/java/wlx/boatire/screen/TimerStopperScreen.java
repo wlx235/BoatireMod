@@ -10,18 +10,17 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import wlx.boatire.Boatire;
-import wlx.boatire.util.BoatInfo;
+import wlx.boatire.util.TimerRecord;
 
 import java.util.List;
 
 import static java.lang.Math.min;
 
-public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier(Boatire.MOD_ID, "textures/gui/boat_timer_starter_gui.png");
+public class TimerStopperScreen extends HandledScreen<TimerStopperScreenHandler> {
+    private static final Identifier TEXTURE = new Identifier(Boatire.MOD_ID, "textures/gui/boat_timer_stopper_gui.png");
     private TextFieldWidget detectLengthField;
-    private TextFieldWidget lapsGoField;
 
-    public TimerStarterScreen(TimerStarterScreenHandler handler, PlayerInventory inventory, Text title) {
+    public TimerStopperScreen(TimerStopperScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
 
@@ -35,13 +34,9 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
         int y = (height - backgroundHeight) / 2;
 
         int initDetect = this.handler.getInitialDetect();
-        int initLaps   = this.handler.getInitialLaps();
 
         this.detectLengthField = new TextFieldWidget(
                 textRenderer, x + 10, y + 27, 41, 10, Text.empty()
-        );
-        this.lapsGoField = new TextFieldWidget(
-                textRenderer, x + 10, y + 57, 41, 10, Text.empty()
         );
 
         this.detectLengthField.setMaxLength(2);
@@ -49,12 +44,6 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
         this.detectLengthField.setDrawsBackground(false);
         this.detectLengthField.setText(String.valueOf(initDetect));
         addDrawableChild(this.detectLengthField);
-
-        this.lapsGoField.setMaxLength(2);
-        this.lapsGoField.setTextPredicate(text -> text.matches("\\d*"));
-        this.lapsGoField.setDrawsBackground(false);
-        this.lapsGoField.setText(String.valueOf(initLaps));
-        addDrawableChild(this.lapsGoField);
     }
 
     private int clampInt(String text, int min, int max) {
@@ -85,29 +74,32 @@ public class TimerStarterScreen extends HandledScreen<TimerStarterScreenHandler>
     @Override
     public void close() {
         int detect = clampInt(this.detectLengthField != null ? this.detectLengthField.getText() : "3", 1, 32);
-        int laps = clampInt(this.lapsGoField != null ? this.lapsGoField.getText() : "0", 0, 99);
 
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBlockPos(this.handler.getPos());
         buf.writeInt(detect);
-        buf.writeInt(laps);
-        ClientPlayNetworking.send(Boatire.TIMER_STARTER_UPDATE, buf);
+
+        ClientPlayNetworking.send(Boatire.TIMER_STOPPER_UPDATE, buf);
         super.close();
     }
 
     public void renderBoatContent(DrawContext context){
-        List<BoatInfo> boats = handler.getBoatList();
+
+        List<TimerRecord> boats = handler.getRecordList();
         int startX = (width - backgroundWidth) / 2 + 58;
         int startY = (height - backgroundHeight) / 2 + 12;
         int lineHeight = 8;
-        for (int i = 0;i < min(boats.size(),14);i++) {
-            if (i >= 7 && startX == (width - backgroundWidth) / 2 + 58){startX += 54;startY -= lineHeight*7;}
-            BoatInfo info = boats.get(i);
+        for (int i = 0;i < min(boats.size(),7);i++) {
+            TimerRecord info = boats.get(i);
             int y = startY + lineHeight*i + 1;
+            String timerText = ((info.TotalTime() >= 72000) ? info.TotalTime() / 72000 + ":" : "") +
+                    String.format("%02d", (info.TotalTime() % 72000) / 1200) + ":" +
+                    String.format("%02d", (info.TotalTime() % 1200) / 20) + ":" +
+                    String.format("%02d", info.TotalTime() % 20 * 5);
             context.fill(startX + 1, y, startX + 11, y + lineHeight - 1, info.color() | 0xFF000000);
             context.drawText(textRenderer, Text.literal(info.driver()), startX + 13, y, 0xFFFFFFFF, true);
+            context.drawText(textRenderer, Text.literal(timerText), startX + 50, y, info.textColor(), true);
         }
-
     }
 
 }

@@ -15,15 +15,15 @@ import net.minecraft.util.Identifier;
 import wlx.boatire.Boatire;
 import wlx.boatire.block.custom.TestBlock;
 import wlx.boatire.block.custom.TimerStarterBlock;
+import wlx.boatire.block.custom.TimerStopperBlock;
 import wlx.boatire.block.custom.TireChangerBlock;
-
-import java.util.Timer;
 
 public class ModBlocks {
 
     public static final Block TIRE_CHANGER = register("tire_changer", new TireChangerBlock(FabricBlockSettings.create().requiresTool().strength(1.5F, 6.0F)));
     public static final Block TEST_BLOCK = register("test", new TestBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
     public static final Block TIMER_STARTER = register("timer_starter", new TimerStarterBlock(FabricBlockSettings.create().requiresTool().strength(1.5F, 6.0F)));
+    public static final Block TIMER_STOPPER = register("timer_stopper", new TimerStopperBlock(FabricBlockSettings.create().requiresTool().strength(1.5F, 6.0F)));
 
     public static final Block HIGH_F_ICE = register(
             "high_f_ice",
