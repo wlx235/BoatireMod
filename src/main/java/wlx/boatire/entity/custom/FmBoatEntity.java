@@ -11,7 +11,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LilyPadBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.sound.EntityTrackingSoundInstance;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -140,7 +142,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
     @Override
     public boolean isLogicalSideForUpdatingMovement() {
-        return true;
+        return this.getControllingPassenger() instanceof PlayerEntity playerEntity ? playerEntity.isMainPlayer() : this.canMoveVoluntarily();
     }
 
     @Override
@@ -336,6 +338,7 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
         if (this.isLogicalSideForUpdatingMovement()) {
 
             LivingEntity driver = this.getControllingPassenger();
+            /*
             if (driver instanceof PlayerEntity player) {
                 if (this.getWorld().isClient && player instanceof ClientPlayerEntity clientPlayer) {
                     boolean l = clientPlayer.input.pressingLeft;
@@ -361,11 +364,22 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
             if (!(this.getFirstPassenger() instanceof PlayerEntity)) {
                 this.setPaddleMovings(false, false);
             }
+
+             */
+            if (driver instanceof ClientPlayerEntity player) {
+                this.setInputs(
+                        player.input.pressingLeft,
+                        player.input.pressingRight,
+                        player.input.pressingForward,
+                        player.input.pressingBack
+                );
+            } else {
+                this.setInputs(false, false, false, false);
+            }
             this.updateVelocity();
             this.updatePaddles();
 
             if (this.getWorld().isClient) {
-
                 this.getWorld().sendPacket(new BoatPaddleStateC2SPacket(this.isPaddleMoving(0), this.isPaddleMoving(1)));
             }
             this.decreaseTireDur();
@@ -377,30 +391,34 @@ public class FmBoatEntity extends Entity implements VariantHolder<FmBoatEntity.F
 
         this.handleBubbleColumn();
 
-        for (int i = 0; i <= 1; i++) {
-            if (this.isPaddleMoving(i)) {
-                if (!this.isSilent()
-                        && this.paddlePhases[i] % (float) (Math.PI * 2) <= (float) (Math.PI / 4)
-                        && (this.paddlePhases[i] + (float) (Math.PI / 8)) % (float) (Math.PI * 2) >= (float) (Math.PI / 4)) {
-                    SoundEvent soundEvent = this.getPaddleSoundEvent();
-                    if (soundEvent != null) {
+        if (this.getWorld().isClient()) {
+            for (int i = 0; i <= 1; i++) {
+                if (this.isPaddleMoving(i)) {
+                    if (!this.isSilent()
+                            && this.paddlePhases[i] % (float) (Math.PI * 2) <= (float) (Math.PI / 4)
+                            && (this.paddlePhases[i] + (float) (Math.PI / 8)) % (float) (Math.PI * 2) >= (float) (Math.PI / 4)) {
+                        SoundEvent soundEvent = this.getPaddleSoundEvent();
+                        if (soundEvent != null) {
 
-                        Vec3d vec3d = this.getRotationVec(1.0F);
-                        double d = i == 1 ? -vec3d.z : vec3d.z;
-                        double e = i == 1 ? vec3d.x : -vec3d.x;
-                        this.getWorld()
-                                .playSound(null, this.getX() + d, this.getY(), this.getZ() + e, soundEvent, SoundCategory.PLAYERS, 1.0F, 0.8F + 0.4F * this.random.nextFloat());
-                        //MinecraftClient.getInstance().getSoundManager().play(
-                        //        new EntityTrackingSoundInstance(soundEvent, SoundCategory.NEUTRAL,
-                        //                1.0F, 0.8F + 0.4F * this.random.nextFloat(), this, this.random.nextLong())
-                        //);
+                            Vec3d vec3d = this.getRotationVec(1.0F);
+                            double d = i == 1 ? -vec3d.z : vec3d.z;
+                            double e = i == 1 ? vec3d.x : -vec3d.x;
 
+                            //this.playSound(soundEvent, 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+                            //Boatire.LOGGER.info("playing sound");
+                            if (this.getWorld().isClient()) {
+                                MinecraftClient.getInstance().getSoundManager().play(
+                                        new EntityTrackingSoundInstance(soundEvent, SoundCategory.NEUTRAL,
+                                                1.0F, 0.8F + 0.4F * this.random.nextFloat(), this, this.random.nextLong())
+                                );
+                            }
+                        }
                     }
-                }
 
-                this.paddlePhases[i] = this.paddlePhases[i] + (float) (Math.PI / 8);
-            } else {
-                this.paddlePhases[i] = 0.0F;
+                    this.paddlePhases[i] = this.paddlePhases[i] + (float) (Math.PI / 8);
+                } else {
+                    this.paddlePhases[i] = 0.0F;
+                }
             }
         }
 

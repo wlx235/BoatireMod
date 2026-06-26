@@ -134,11 +134,14 @@ public class TimerStopperBlockEntity extends BlockEntity implements ExtendedScre
 
     public void tick(World world1, BlockPos pos, BlockState state1){
         if (world1.isClient()){return;}
-        detectBoats(world1, pos, state1);
+
 
         boolean powered = false;
         if (world != null) {powered = world.getReceivedRedstonePower(pos) > 0;}
-        if (powered)stopTimer();
+        if (powered){
+            detectBoats(world1, pos, state1);
+            stopTimer();
+        }
     }
 
     private void detectBoats(World world1, BlockPos pos1, BlockState state1){

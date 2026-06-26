@@ -14,7 +14,10 @@ import wlx.boatire.entity.custom.FmBoatEntity;
 public class ModEntities {
     public static final EntityType<FmBoatEntity> FM_BOAT_ENTITY = Registry.register(Registries.ENTITY_TYPE,
             new Identifier(Boatire.MOD_ID, "fm_boat"),
-            FabricEntityTypeBuilder.<FmBoatEntity>create(SpawnGroup.MISC,FmBoatEntity::new).dimensions(EntityDimensions.fixed(1.375F,0.5625F)).build());
+            FabricEntityTypeBuilder.<FmBoatEntity>create(SpawnGroup.MISC,FmBoatEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.375F,0.5625F))
+                    .trackRangeChunks(10)
+                    .build());
 
     public static void registerEntities(){}
 }

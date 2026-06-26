@@ -69,19 +69,6 @@ public class BoatireModClient implements ClientModInitializer {
                     });
                 }
         );
-        ServerPlayNetworking.registerGlobalReceiver(BOAT_INPUT_SYNC, (server, player, handler, buf, responseSender) -> {
-            int entityId = buf.readInt();
-            boolean l = buf.readBoolean();
-            boolean r = buf.readBoolean();
-            boolean f = buf.readBoolean();
-            boolean b = buf.readBoolean();
-
-            server.execute(() -> {
-                if (player.getWorld().getEntityById(entityId) instanceof FmBoatEntity boat) {
-                    boat.setInputs(l, r, f, b);
-                }
-            });
-        });
 
         ClientPlayNetworking.registerGlobalReceiver(TIMER_STARTER_BOAT_INFO_SYNC, (client, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();

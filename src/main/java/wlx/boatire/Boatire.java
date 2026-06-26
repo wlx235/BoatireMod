@@ -28,7 +28,6 @@ public class Boatire implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final Identifier TIRE_CHANGER_SYNC =
 			new Identifier(MOD_ID, "tire_changer_sync");
-	public static final Identifier BOAT_INPUT_SYNC = new Identifier(MOD_ID, "boat_input_sync");
 	public static final Identifier TIMER_STARTER_UPDATE = new Identifier(MOD_ID, "timer_starter_update");
 	public static final Identifier TIMER_STARTER_BOAT_INFO_SYNC = new Identifier(MOD_ID, "timer_starter_boat_info_sync");
 	public static final Identifier TIMER_STOPPER_UPDATE = new Identifier(MOD_ID, "timer_stopper_update");
